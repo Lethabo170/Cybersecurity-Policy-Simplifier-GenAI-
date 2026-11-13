@@ -1,0 +1,127 @@
+{
+    "widgets": [
+        {
+            "x": 0,
+            "y": 0,
+            "type": "static-text",
+            "title": "Disclaimer",
+            "width": 12,
+            "height": 3,
+            "content": "⚠️ This app is a readability aid only. Output is not the official policy and is not legal advice. Always refer to the authoritative policy document for compliance."
+        },
+        {
+            "x": 0,
+            "y": 3,
+            "type": "text-input",
+            "title": "PolicyText",
+            "width": 12,
+            "height": 6,
+            "placeholder": "Paste the original policy text here",
+            "defaultValue": ""
+        },
+        {
+            "x": 0,
+            "y": 9,
+            "type": "select",
+            "title": "ReadingLevel",
+            "width": 6,
+            "height": 2,
+            "options": [
+                "Plain (grade 8)",
+                "General (grade 10)",
+                "Professional"
+            ],
+            "defaultValue": "Plain (grade 8)"
+        },
+        {
+            "x": 6,
+            "y": 9,
+            "type": "select",
+            "title": "TargetAudience",
+            "width": 6,
+            "height": 2,
+            "options": [
+                "All Employees",
+                "Engineers / IT Staff",
+                "Executives / Leadership",
+                "Contractors / Third Parties",
+                "New Hires"
+            ],
+            "defaultValue": "All Employees"
+        },
+        {
+            "x": 0,
+            "y": 11,
+            "type": "select",
+            "title": "KeepMandatory",
+            "width": 6,
+            "height": 2,
+            "options": [
+                "Yes",
+                "No"
+            ],
+            "defaultValue": "Yes"
+        },
+        {
+            "x": 0,
+            "y": 13,
+            "type": "inferred-text",
+            "title": "PlainLanguagePolicy",
+            "width": 6,
+            "height": 10,
+            "prompt": "You are a cybersecurity compliance translator. Rewrite the policy below into plain language at the chosen reading level.\n\nCONTEXT\n- Reading level: [ReadingLevel]\n- Target audience: [TargetAudience]\n- Keep mandatory legal sentences verbatim: [KeepMandatory]\n\nORIGINAL POLICY\n[PolicyText]\n\nHARD RULES\n1. Only simplify what is explicitly present. Never invent, add, infer, or fill in a requirement.\n2. If the text is ambiguous, vague, or silent on a topic, flag it inline using the format AMBIGUOUS followed by a colon and the detail, or POLICY IS SILENT ON followed by a colon and the detail, wrapped in square brackets. Do not resolve it yourself.\n3. Preserve every must, must not, shall, required, and prohibited. Never soften mandatory language.\n4. Copy all numbers exactly (timelines, retention periods, password lengths, thresholds). Do not round or rephrase.\n5. If the verbatim setting is Yes, keep each mandatory obligation sentence in its original wording, then add a plain-language explanation directly beneath it.\n6. Short sentences. No jargon. If a technical term is unavoidable, define it in parentheses.\n\nOUTPUT FORMAT\n**What this policy is about** (1-2 sentences)\n**What you need to know** (bullets)\n**What you MUST do** (bullets)\n**What you MUST NOT do** (bullets)\n**Open questions for the policy owner** (carry forward every ambiguity and silent-on flag here)",
+            "parameters": {
+                "temperature": 0.2
+            }
+        },
+        {
+            "x": 6,
+            "y": 13,
+            "type": "inferred-text",
+            "title": "RoleGuide",
+            "width": 6,
+            "height": 8,
+            "prompt": "Write a short 'What this means for me' section for the audience below, based strictly on the simplified policy.\n\nTARGET AUDIENCE: [TargetAudience]\n\nSIMPLIFIED POLICY\n[PlainLanguagePolicy]\n\nFOCUS BY AUDIENCE\n- All Employees → everyday behavior and reporting habits\n- Engineers / IT Staff → technical implementation and configuration duties\n- Executives / Leadership → risk ownership, approval, and escalation duties\n- Contractors / Third Parties → access boundaries and reporting channels\n- New Hires → first-week actions and where to ask questions\n\nRULES\n- Do not introduce any requirement not already in the policy.\n- Do not resolve any flagged ambiguity; tell the audience to confirm with the policy owner.\n- Max 150 words. Bullets preferred.",
+            "parameters": {
+                "temperature": 0.3
+            }
+        },
+        {
+            "x": 0,
+            "y": 21,
+            "type": "inferred-text",
+            "title": "DosAndDonts",
+            "width": 6,
+            "height": 8,
+            "prompt": "List exactly 5 do's and 5 don'ts drawn ONLY from the obligations in the simplified policy below.\n\n[PlainLanguagePolicy]\n\nRULES\n- Every bullet must be traceable to the policy. Do not add general security advice.\n- Do not include anything flagged as ambiguous or silent-on.\n- Keep each bullet one sentence.\n\nOUTPUT FORMAT\n**✅ DO:**\n1. ...\n2. ...\n3. ...\n4. ...\n5. ...\n\n**❌ DONT:**\n1. ...\n2. ...\n3. ...\n4. ...\n5. ...",
+            "parameters": {
+                "temperature": 0.2
+            }
+        },
+        {
+            "x": 6,
+            "y": 21,
+            "type": "inferred-text",
+            "title": "FidelityAudit",
+            "width": 6,
+            "height": 10,
+            "prompt": "Compare [PolicyText] (original) with [PlainLanguagePolicy] (simplified). Audit only; do not rewrite.\n\nFor each requirement in the original, check whether it was kept, dropped, weakened, or changed in meaning.\n- If kept exactly → do not list it.\n- If dropped → tag it using the word DROPPED wrapped in square brackets.\n- If weakened → tag it using the word WEAKENED followed by a colon and was X then now Y, wrapped in square brackets.\n- If meaning changed → tag it using the words MEANING CHANGED followed by a colon and was X then now Y, wrapped in square brackets.\n- If no issues → output 'No fidelity issues detected.'\n\nAlso carry forward every ambiguity flag and policy-is-silent-on flag from the simplified version using their original bracketed tags; do not resolve them.",
+            "parameters": {
+                "temperature": 0.2
+            }
+        },
+        {
+            "x": 0,
+            "y": 31,
+            "type": "inferred-text",
+            "title": "ComprehensionCheck",
+            "width": 12,
+            "height": 10,
+            "prompt": "Create 4 multiple-choice comprehension questions testing the obligations below. Scenarios, not definitions.\n\nKEY OBLIGATIONS\n[DosAndDonts]\n\nTARGET AUDIENCE: [TargetAudience]\n\nOUTPUT FORMAT (repeat for Q1-Q4)\n**Question N:** a realistic scenario\nA) ...\nB) ...\nC) ...\nD) ...\n**Correct answer:** the letter of the correct option\n**Why:** one sentence citing the obligation being tested\n\nRULES\n- Only test obligations that actually appear in the obligations list above.\n- Never test anything tagged as dropped, weakened, meaning changed, ambiguous, or policy-is-silent-on.\n- Keep scenarios realistic for the target audience.",
+            "parameters": {
+                "temperature": 0.4
+            }
+        }
+    ]
+}
+
