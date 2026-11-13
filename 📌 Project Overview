@@ -1,3 +1,6 @@
+Live Application Link: https://partyrock.aws/u/Lethabo002/ToCUiowqWmah/Cybersecurity-Policy-Simplifier
+
+
 The Cybersecurity Policy Simplifier is a generative AI application built on AWS PartyRock (powered by Amazon Bedrock). It solves a critical compliance and GRC (Governance, Risk, and Compliance) problem: security policies are often written in dense legal and technical jargon, making them difficult for general employees, executives, and IT staff to understand and follow.
 This tool ingests raw policy text and outputs a plain-language version, role-specific guidance, an actionable Do/Don't list, and a comprehension quiz, all while maintaining strict AI guardrails to prevent hallucination and policy drift.
 ✨ Key Features
