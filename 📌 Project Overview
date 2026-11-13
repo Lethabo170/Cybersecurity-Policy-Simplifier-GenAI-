@@ -1,0 +1,24 @@
+The Cybersecurity Policy Simplifier is a generative AI application built on AWS PartyRock (powered by Amazon Bedrock). It solves a critical compliance and GRC (Governance, Risk, and Compliance) problem: security policies are often written in dense legal and technical jargon, making them difficult for general employees, executives, and IT staff to understand and follow.
+This tool ingests raw policy text and outputs a plain-language version, role-specific guidance, an actionable Do/Don't list, and a comprehension quiz, all while maintaining strict AI guardrails to prevent hallucination and policy drift.
+✨ Key Features
+•	Multi-Level Translation: Adapts policy language to specific reading levels (Grade 8, Grade 10, Professional).
+•	Role-Based Guidance: Generates tailored "What this means for me" sections for different audiences (Employees, Executives, IT, Contractors).
+•	Zero-Hallucination Guardrails: Uses prompt engineering to explicitly flag ambiguous text [AMBIGUOUS: ...] or missing clauses [POLICY IS SILENT ON: ...] rather than inventing rules.
+•	Fidelity Audit (QA Layer): Automatically compares the generated plain-language version against the original text to flag any dropped, weakened, or altered requirements.
+•	Automated Comprehension Check: Generates 4 scenario-based multiple-choice questions strictly derived from the generated obligations.
+
+
+🏗️ Architecture & Workflow
+This app uses a sequential AI chaining architecture. The output of one widget becomes the context for the next, creating a robust data pipeline:
+1.	Input: PolicyText (Paragraph), ReadingLevel (Dropdown), TargetAudience (Dropdown), KeepMandatory (Checkbox).
+2.	Processing Engine 1 (PlainLanguagePolicy): Ingests raw text and applies plain-language rules. Temp: 0.2.
+3.	Processing Engine 2 (RoleGuide): Ingests simplified text and tailors it to the selected audience. Temp: 0.3.
+4.	Processing Engine 3 (DosAndDonts): Extracts exact obligations into a 5x5 list. Temp: 0.2.
+5.	QA Engine (FidelityAudit): Compares Input vs. Output of Engine 1 to catch any lost requirements. Temp: 0.2.
+6.	Training Engine (ComprehensionCheck): Generates a quiz based on Engine 3's output. Temp: 0.4.
+
+
+🛠️ Tech Stack
+•	Platform: AWS PartyRock (No-code GenAI app builder)
+•	Foundation Model: Anthropic Claude (via Amazon Bedrock)
+•	Integration: AWS PartyRock @ widget referencing and state management.
