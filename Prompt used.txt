@@ -1,0 +1,119 @@
+Build an app called "Policy Simplifier". The user pastes a cybersecurity policy and gets a plain-language version plus supporting outputs.
+
+Widgets in this exact order:
+
+1. Static Text — Disclaimer:
+"⚠️ This app is a readability aid only. Output is not the official policy and is not legal advice. Always refer to the authoritative policy document for compliance."
+
+2. User Input (Paragraph), label "PolicyText", placeholder "Paste the original policy text here".
+
+3. User Input (Dropdown), label "ReadingLevel", options: "Plain (grade 8)", "General (grade 10)", "Professional".
+
+4. User Input (Dropdown), label "TargetAudience", options: "All Employees", "Engineers / IT Staff", "Executives / Leadership", "Contractors / Third Parties", "New Hires".
+
+5. User Input (Checkbox), label "KeepMandatory", default checked.
+
+6. AI Text widget named "PlainLanguagePolicy". Temperature 0.2. Prompt:
+"You are a cybersecurity compliance translator. Rewrite the policy below into plain language at the chosen reading level.
+
+CONTEXT
+- Reading level: @ReadingLevel
+- Target audience: @TargetAudience
+- Keep mandatory legal sentences verbatim: @KeepMandatory
+
+ORIGINAL POLICY
+@PolicyText
+
+HARD RULES
+1. Only simplify what is explicitly present. Never invent, add, infer, or fill in a requirement.
+2. If the text is ambiguous, vague, or silent on a topic, flag it inline as [AMBIGUOUS: ...] or [POLICY IS SILENT ON: ...]. Do not resolve it yourself.
+3. Preserve every must, must not, shall, required, and prohibited. Never soften mandatory language.
+4. Copy all numbers exactly (timelines, retention periods, password lengths, thresholds). Do not round or rephrase.
+5. If the verbatim checkbox is checked, keep each mandatory obligation sentence in its original wording, then add a plain-language explanation directly beneath it.
+6. Short sentences. No jargon. If a technical term is unavoidable, define it in parentheses.
+
+OUTPUT FORMAT
+**What this policy is about** (1-2 sentences)
+**What you need to know** (bullets)
+**What you MUST do** (bullets)
+**What you MUST NOT do** (bullets)
+**Open questions for the policy owner** (carry forward every ambiguity and silent-on flag here)"
+
+7. AI Text widget named "RoleGuide". Temperature 0.3. Prompt:
+"Write a short 'What this means for me' section for the audience below, based strictly on the simplified policy.
+
+TARGET AUDIENCE: @TargetAudience
+
+SIMPLIFIED POLICY
+@PlainLanguagePolicy
+
+FOCUS BY AUDIENCE
+- All Employees → everyday behavior and reporting habits
+- Engineers / IT Staff → technical implementation and configuration duties
+- Executives / Leadership → risk ownership, approval, and escalation duties
+- Contractors / Third Parties → access boundaries and reporting channels
+- New Hires → first-week actions and where to ask questions
+
+RULES
+- Do not introduce any requirement not already in the policy.
+- Do not resolve any flagged ambiguity; tell the audience to confirm with the policy owner.
+- Max 150 words. Bullets preferred."
+
+8. AI Text widget named "DosAndDonts". Temperature 0.2. Prompt:
+"List exactly 5 do's and 5 don'ts drawn ONLY from the obligations in the simplified policy below.
+
+@PlainLanguagePolicy
+
+RULES
+- Every bullet must be traceable to the policy. Do not add general security advice.
+- Do not include anything flagged as ambiguous or silent-on.
+- Keep each bullet one sentence.
+
+OUTPUT FORMAT
+**✅ DO:**
+1. ...
+2. ...
+3. ...
+4. ...
+5. ...
+
+**❌ DON'T:**
+1. ...
+2. ...
+3. ...
+4. ...
+5. ..."
+
+9. AI Text widget named "FidelityAudit". Temperature 0.2. Prompt:
+"Compare @PolicyText (original) with @PlainLanguagePolicy (simplified). Audit only; do not rewrite.
+
+For each requirement in the original, check whether it was kept, dropped, weakened, or changed in meaning.
+- If kept exactly → do not list it.
+- If dropped → tag [DROPPED].
+- If weakened → tag [WEAKENED: was 'X' → now 'Y'].
+- If meaning changed → tag [MEANING CHANGED: was 'X' → now 'Y'].
+- If no issues → output 'No fidelity issues detected.'
+
+Also carry forward every [AMBIGUOUS] and [POLICY IS SILENT ON] flag from the simplified version; do not resolve them."
+
+10. AI Text widget named "ComprehensionCheck". Temperature 0.4. Prompt:
+"Create 4 multiple-choice comprehension questions testing the obligations below. Scenarios, not definitions.
+
+KEY OBLIGATIONS
+@DosAndDonts
+
+TARGET AUDIENCE: @TargetAudience
+
+OUTPUT FORMAT (repeat for Q1-Q4)
+**Question N:** [realistic scenario]
+A) ...
+B) ...
+C) ...
+D) ...
+**Correct answer:** [letter]
+**Why:** [one sentence citing the obligation tested]
+
+RULES
+- Only test obligations that actually appear in the obligations list.
+- Never test anything tagged [DROPPED], [WEAKENED], [MEANING CHANGED], [AMBIGUOUS], or [POLICY IS SILENT ON].
+- Keep scenarios realistic for the target audience."
